@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(deu_car)
+project(deu_car_11)
 find_package(catkin REQUIRED COMPONENTS
   rospy
 )
