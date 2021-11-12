@@ -34,7 +34,7 @@ class BlockDetector:
         block_bar_mask[240:h, 0:w] = 0
 
         # contours 에 해당 마스크 내에서 빨간색 부분을 이진화하여 객체의 갯수를 카운트하여 contours 에 저장
-        block_bar_mask, self.contours,  = cv2.findContours(block_bar_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        block_bar_mask, self.contours, hierarchy = cv2.findContours(block_bar_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
 
 if __name__ == '__main__':
