@@ -37,7 +37,7 @@ class DetectBlockingBar(State):
 
                 print('go')
 
-                start_time = time.time() +3
+                start_time = time.time() + 4
 
                 while True:
                     block_finder.drive_controller.drive()
@@ -64,18 +64,17 @@ class LaneTrace(State):
         State.__init__(self, outcomes=['success'])
 
     def execute(self, ud):
-        left_line = LineTracer('left_camera/rgb/image_raw')
-        right_line = LineTracer('right_camera/rgb/image_raw')
-        stop_line = LineTracer('camera/rgb/image_raw')
+        line = LineTracer()
         drive_controller = RobotDriveController()
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(20)
         count = 0
 
         while not rospy.is_shutdown():
-            cx = (left_line.cx + right_line.cx) / 2
+            cx = (line.lcx + line.rcx) / 2 - 320
             err = -float(cx) / 100
+            print abs(err)
 
-            if stop_line.area > 9000.0:
+            if line.area > 9000.0:
                 drive_controller.set_velocity(0)
                 drive_controller.set_angular(0)
                 count = count + 1
@@ -110,13 +109,13 @@ class LaneTrace(State):
 
                 drive_controller.set_velocity(0)
 
-            if abs(err) > 0.17:
-                drive_controller.set_velocity(0.4)
+            if abs(err) >= 0.5:
+                drive_controller.set_velocity(0.3)
                 drive_controller.set_angular(err)
                 drive_controller.drive()
 
-            elif abs(err) < 0.17:
-                drive_controller.set_velocity(1)
+            elif abs(err) < 0.5:
+                drive_controller.set_velocity(0.6)
                 drive_controller.set_angular(err)
                 drive_controller.drive()
 
