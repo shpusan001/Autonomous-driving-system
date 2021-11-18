@@ -14,8 +14,8 @@ class LineTracer:
         self.bridge = cv_bridge.CvBridge()
         # 추적하는 라인에 무게중심 점을 찍는 토픽 카메라 2개로 판단.
         # self.image_pub = rospy.Publisher(image_topic + "/circle", Image, queue_size=1)
-        self.image_sub = rospy.Subscriber('left_camera/rgb/image_raw', Image, self.image_callback_l)
-        self.image_sub = rospy.Subscriber('right_camera/rgb/image_raw', Image, self.image_callback_r)
+        self.l_image_sub = rospy.Subscriber('left_camera/rgb/image_raw', Image, self.image_callback_l)
+        self.r_image_sub = rospy.Subscriber('right_camera/rgb/image_raw', Image, self.image_callback_r)
         # self.t = image_topic
         self.lcx, self.rcx = 0, 0
         self.lcy, self.rcy = 0, 0
@@ -30,42 +30,50 @@ class LineTracer:
         # hsv 이미지로 변환.
         hsv_image = cv2.cvtColor(origin_image, cv2.COLOR_BGR2HSV)
 
-        # v 값을 이미지에서 추출하여 값에 넣어줌.
-        _, _, v = cv2.split(hsv_image)
-        # 노란색 이미지의 범위를 지정.
-        v = cv2.inRange(v, 210, 220)
+        lower = numpy.array([0, 40, 135])
+        upper = numpy.array([135, 135, 255])
 
+        mask = cv2.inRange(hsv_image, lower, upper)
+        h, w, d = origin_image.shape
+        top = 3 * h / 8
+        bot = top + 20
+        mask[0:top, 0:w] = 0
+        mask[bot:h, 0:w] = 0
         # 감지한 객체의 무게 중심을 화면에 찍는 변수
         # M은 리스트 형식이다.
-        M = cv2.moments(v)
+        M = cv2.moments(mask)
         if M['m00'] > 0:
             self.lcx = int(M['m10'] / M['m00'])
             self.lcy = int(M['m01'] / M['m00'])
-            cv2.circle(origin_image, (self.lcx, self.lcy), 10, (0, 255, 0), -1)
+            cv2.circle(origin_image, (self.lcx, self.lcy), 20, (0, 255, 0), -1)
             # self.lcx = self.lcx - 320
-        cv2.imshow('2', origin_image)
-        cv2.waitKey(3)
+            # cv2.imshow('window', origin_image)
+            # cv2.waitKey(3)
 
     def image_callback_r(self, msg):
         origin_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         # hsv 이미지로 변환.
         hsv_image = cv2.cvtColor(origin_image, cv2.COLOR_BGR2HSV)
 
-        # v 값을 이미지에서 추출하여 값에 넣어줌.
-        _, _, v = cv2.split(hsv_image)
-        # 노란색 이미지의 범위를 지정.
-        v = cv2.inRange(v, 210, 220)
+        lower = numpy.array([0, 40, 135])
+        upper = numpy.array([135, 135, 255])
 
+        mask = cv2.inRange(hsv_image, lower, upper)
+        h, w, d = origin_image.shape
+        top = 3 * h / 8
+        bot = top + 20
+        mask[0:top, 0:w] = 0
+        mask[bot:h, 0:w] = 0
         # 감지한 객체의 무게 중심을 화면에 찍는 변수
         # M은 리스트 형식이다.
-        M = cv2.moments(v)
+        M = cv2.moments(mask)
         if M['m00'] > 0:
             self.rcx = int(M['m10'] / M['m00'])
             self.rcy = int(M['m01'] / M['m00'])
-            cv2.circle(origin_image, (self.rcx, self.rcy), 10, (0, 255, 0), -1)
+            cv2.circle(origin_image, (self.rcx, self.rcy), 15, (0, 255, 0), -1)
             # self.rcx = self.rcx - 320
-        #cv2.imshow('1',origin_image)
-        #cv2.waitKey(3)
+            # cv2.imshow('window', origin_image)
+            # cv2.waitKey(3)
 
     def image_callback_c(self, msg):
         image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -110,9 +118,9 @@ if __name__ == '__main__':
     rate = rospy.Rate(20)
     count = 0
     while not rospy.is_shutdown():
-        cx = (line.lcx + line.rcx) / 2
+        cx = (line.lcx-40 + line.rcx) / 2 - 320
         err = -float(cx)/100
-        print err
+        # print err
         if line.area > 9000.0:
             drive_controller.set_velocity(0)
             drive_controller.set_angular(0)
@@ -126,12 +134,12 @@ if __name__ == '__main__':
             drive_controller.set_angular(0)
             drive_controller.drive()
 
-        if abs(err) > 0.20 and line.area < 9000.0:
+        if abs(err) >= 0.50 and line.area < 9000.0:
             drive_controller.set_velocity(0.6)
             drive_controller.set_angular(err)
             drive_controller.drive()
 
-        elif abs(err) <= 0.20 and line.area < 9000.0:
+        elif abs(err) < 0.50 and line.area < 9000.0:
             drive_controller.set_velocity(0.6)
             drive_controller.set_angular(err)
             drive_controller.drive()

@@ -21,7 +21,6 @@ class BlockDetector:
 
     def image_callback(self, msg):
         origin_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-
         # 빨강 값의 최대치와 최소치의 값을 설정하여 gray_img 로 변환
         lower_red = np.array([0, 0, 90])
         upper_red = np.array([5, 5, 110])
@@ -35,6 +34,7 @@ class BlockDetector:
 
         # contours 에 해당 마스크 내에서 빨간색 부분을 이진화하여 객체의 갯수를 카운트하여 contours 에 저장
         block_bar_mask, self.contours, hierarchy = cv2.findContours(block_bar_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.waitKey(3)
 
 
 if __name__ == '__main__':
