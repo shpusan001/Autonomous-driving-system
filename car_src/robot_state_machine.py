@@ -10,7 +10,8 @@ if __name__ == "__main__":
     with driving_test_site:
         StateMachine.add('SETTING_LANE', SettingLane(), transitions={'success': 'DETECT_BLOCKING_BAR'})
         StateMachine.add('DETECT_BLOCKING_BAR', DetectBlockingBar(), transitions={'success': 'LANE_TRACE'})
-        StateMachine.add('LANE_TRACE', LaneTrace(), transitions={'success': 'success'})
+        StateMachine.add('LANE_TRACE', LaneTrace(), transitions={'success': 'ENTER_THE_S_COURSE'})
+        StateMachine.add('ENTER_THE_S_COURSE', Straight(), transitions={'success': 'success'})
         # StateMachine.add('RIGHT_ANGLE_PARKING', RightAngleParking(), transitions={'success': 'DETECT_OBSTACLE'})
         # StateMachine.add('DETECT_STOP_SIGN1', DetectStopSign(), transitions={'success': 'LANE_TRACE2'})
         # StateMachine.add('LANE_TRACE2', LaneTrace(), transitions={'success': 'DETECT_OBSTACLE'})

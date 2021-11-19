@@ -108,12 +108,12 @@ class LaneTrace(State):
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_velocity(0.4)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_velocity(0.4)
                     # drive_controller.set_angular(err)
                     drive_controller.drive()
             elif count == 3:
@@ -140,6 +140,22 @@ class LaneTrace(State):
                 print 'S course end!'
                 return 'success'
         rospy.sleep()
+
+
+class Straight(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['success'])
+
+    def execute(self, ud):
+        drive_controller = RobotDriveController()
+        start_time = time.time()+3.5
+        while not rospy.is_shutdown():
+            drive_controller.set_velocity(1)
+            drive_controller.set_angular(-0.15)
+            drive_controller.drive()
+            if time.time() - start_time > 0:
+                break
+        return 'success'
 
 
 class AvoidObstacle(State):
