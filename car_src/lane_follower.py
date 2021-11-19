@@ -47,8 +47,8 @@ class LineTracer:
             self.lcy = int(M['m01'] / M['m00'])
             cv2.circle(origin_image, (self.lcx, self.lcy), 20, (0, 255, 0), -1)
             # self.lcx = self.lcx - 320
-            # cv2.imshow('window', origin_image)
-            # cv2.waitKey(3)
+            cv2.imshow('window', origin_image)
+            cv2.waitKey(3)
 
     def image_callback_r(self, msg):
         origin_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
