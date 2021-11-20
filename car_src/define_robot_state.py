@@ -82,7 +82,7 @@ class LaneTrace(State):
                     print(count)
                     if count == 2:
                         drive_controller.set_velocity(0)
-                        drive_controller.set_angular(-0.2)
+                        drive_controller.set_angular(-0.3)
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
@@ -107,15 +107,21 @@ class LaneTrace(State):
                     print(count)
                     rospy.sleep(3)
 
-                if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.4)
-                    drive_controller.set_angular(err)
+                if line.rcx > 10:
+                    if abs(err) >= 0.5:
+                        drive_controller.set_velocity(0.4)
+                        drive_controller.set_angular(err)
+                        drive_controller.drive()
+
+                    elif abs(err) < 0.5:
+                        drive_controller.set_velocity(0.4)
+                        drive_controller.set_angular(err)
+                        drive_controller.drive()
+                elif line.rcx <= 10:
+                    drive_controller.set_velocity(0.1)
+                    drive_controller.set_angular(-0.6)
                     drive_controller.drive()
 
-                elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.4)
-                    # drive_controller.set_angular(err)
-                    drive_controller.drive()
             elif count == 3:
                 cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
                 err = -float(cx) / 100
@@ -137,6 +143,9 @@ class LaneTrace(State):
                     drive_controller.set_angular(err)
                     drive_controller.drive()
             else:
+                if count == 4:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(-0.1)
                 print 'S course end!'
                 return 'success'
         rospy.sleep()
@@ -151,7 +160,7 @@ class Straight(State):
         start_time = time.time()+5
         while not rospy.is_shutdown():
             drive_controller.set_velocity(1)
-            # drive_controller.set_angular(-0.15)
+            drive_controller.set_angular(0)
             drive_controller.drive()
             if time.time() - start_time > 0:
                 break
