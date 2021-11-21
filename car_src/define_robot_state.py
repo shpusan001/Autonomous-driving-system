@@ -60,6 +60,9 @@ class DetectBlockingBar(State):
 
 
 class LaneTrace(State):
+
+    saved_count = 0
+
     def __init__(self):
         State.__init__(self, outcomes=['success'])
 
@@ -67,9 +70,10 @@ class LaneTrace(State):
         line = LineTracer()
         drive_controller = RobotDriveController()
         rospy.Rate(10)
-        count = 0
+        count = LaneTrace.saved_count
 
         while not rospy.is_shutdown():
+            #first stopline
             if count <= 1:
                 cx = (line.lcx + line.rcx) / 2 - 340
                 err = -float(cx) / 100
@@ -95,6 +99,7 @@ class LaneTrace(State):
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
+            #second stop line (z course start)
             elif count == 2:
                 cx = (line.lcx - 40 + line.rcx) / 2 - 320
                 err = -float(cx) / 100
@@ -109,12 +114,12 @@ class LaneTrace(State):
 
                 if line.rcx > 10:
                     if abs(err) >= 0.5:
-                        drive_controller.set_velocity(0.4)
+                        drive_controller.set_velocity(0.44)
                         drive_controller.set_angular(err)
                         drive_controller.drive()
 
                     elif abs(err) < 0.5:
-                        drive_controller.set_velocity(0.4)
+                        drive_controller.set_velocity(0.44)
                         drive_controller.set_angular(err)
                         drive_controller.drive()
                 elif line.rcx <= 10:
@@ -122,7 +127,30 @@ class LaneTrace(State):
                     drive_controller.set_angular(-0.6)
                     drive_controller.drive()
 
+            # third stop line (z course end)
             elif count == 3:
+                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                err = -float(cx) / 100
+                if line.area > 9100.0:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(0)
+                    count = count + 1
+                    print('stop!')
+                    print(count)
+                    rospy.sleep(3)
+
+                if abs(err) >= 0.5:
+                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                elif abs(err) < 0.5:
+                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+            #fourth stop line (cross course start)
+            elif count == 4:
                 cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
                 err = -float(cx) / 100
                 if line.area > 9000.0:
@@ -142,13 +170,63 @@ class LaneTrace(State):
                     drive_controller.set_velocity(0.6)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
-            else:
-                if count == 4:
+
+                # change state
+                count+=1
+                LaneTrace.saved_count = count
+                return "success"
+
+            #free drive, fifth stop line (with s course)
+            elif count == 5 or 6:
+                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                err = -float(cx) / 100
+                if line.area > 9000.0:
                     drive_controller.set_velocity(0)
-                    drive_controller.set_angular(-0.1)
-                print 'S course end!'
-                return 'success'
+                    drive_controller.set_angular(0)
+                    count = count + 1
+                    print('stop!')
+                    print(count)
+                    rospy.sleep(3)
+
+                if abs(err) >= 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                elif abs(err) < 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+            #sixth stop line (cross course start)
+            elif count == 7:
+                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                err = -float(cx) / 100
+                if line.area > 9000.0:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(0)
+                    count = count + 1
+                    print('stop!')
+                    print(count)
+                    rospy.sleep(3)
+
+                if abs(err) >= 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                elif abs(err) < 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                # change state
+                count += 1
+                LaneTrace.saved_count = count
+                return "success"
+
         rospy.sleep()
+
 
 
 class Straight(State):
@@ -157,7 +235,10 @@ class Straight(State):
 
     def execute(self, ud):
         drive_controller = RobotDriveController()
-        start_time = time.time()+5
+        start_time = time.time()+6
+
+        print 'go straight'
+
         while not rospy.is_shutdown():
             drive_controller.set_velocity(1)
             drive_controller.set_angular(0)
