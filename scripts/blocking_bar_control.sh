@@ -14,9 +14,9 @@ do
     echo "Open the blocking bar..."
     rosservice call /gazebo/apply_joint_effort '{joint_name: "blocking_bar_joint", effort: 10, start_time: 0, duration: -1 }'
     rosservice call /gazebo/apply_joint_effort '{joint_name: "blocking_bar_joint", effort: 10, start_time: 0, duration: -1 }'
-    sleep 1
+    sleep 2
     echo "Close the blocking bar..."
     rosservice call /gazebo/clear_joint_forces '{joint_name: blocking_bar_joint}'
-    sleep 5
+    sleep 4
 done
 

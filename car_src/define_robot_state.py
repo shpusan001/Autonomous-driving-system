@@ -61,7 +61,7 @@ class DetectBlockingBar(State):
 
 class LaneTrace(State):
 
-    saved_count = 0
+    saved_count = 8
 
     def __init__(self):
         State.__init__(self, outcomes=['success'])
@@ -90,12 +90,12 @@ class LaneTrace(State):
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.8)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.8)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
@@ -140,12 +140,12 @@ class LaneTrace(State):
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_velocity(0.63)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_velocity(0.63)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
@@ -162,12 +162,12 @@ class LaneTrace(State):
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.63)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.63)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
@@ -177,7 +177,7 @@ class LaneTrace(State):
                 return "success"
 
             #free drive, fifth stop line (with s course)
-            elif count == 5 or 6:
+            elif count == 5:
                 cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
                 err = -float(cx) / 100
                 if line.area > 9000.0:
@@ -195,6 +195,27 @@ class LaneTrace(State):
 
                 elif abs(err) < 0.5:
                     drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+            elif count == 6:
+                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                err = -float(cx) / 100
+                if line.area > 9000.0:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(0)
+                    count = count + 1
+                    print('stop!')
+                    print(count)
+                    rospy.sleep(3)
+
+                if abs(err) >= 0.5:
+                    drive_controller.set_velocity(0.5)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                elif abs(err) < 0.5:
+                    drive_controller.set_velocity(0.5)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
@@ -225,6 +246,52 @@ class LaneTrace(State):
                 LaneTrace.saved_count = count
                 return "success"
 
+            elif count == 8:
+                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                err = -float(cx) / 100
+                if line.area > 9000.0:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(0)
+                    count = count + 1
+                    print('stop!')
+                    print(count)
+                    rospy.sleep(3)
+
+                if abs(err) >= 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                elif abs(err) < 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+            elif count == 9:
+                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                err = -float(cx) / 100
+                if line.area > 9000.0:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(0)
+                    count = count + 1
+                    print('stop!')
+                    print(count)
+                    rospy.sleep(3)
+
+                if abs(err) >= 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+
+                elif abs(err) < 0.5:
+                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_angular(err)
+                    drive_controller.drive()
+                    # change state
+                    count += 1
+                    LaneTrace.saved_count = count
+                    return "success"
+
         rospy.sleep()
 
 
@@ -235,13 +302,49 @@ class Straight(State):
 
     def execute(self, ud):
         drive_controller = RobotDriveController()
-        start_time = time.time()+6
+        start_time = time.time()+5.8
 
         print 'go straight'
 
         while not rospy.is_shutdown():
             drive_controller.set_velocity(1)
             drive_controller.set_angular(0)
+            drive_controller.drive()
+            if time.time() - start_time > 0:
+                break
+        return 'success'
+
+class Straight2(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['success'])
+
+    def execute(self, ud):
+        drive_controller = RobotDriveController()
+        start_time = time.time() + 6.8
+
+        print 'go straight'
+
+        while not rospy.is_shutdown():
+            drive_controller.set_velocity(1)
+            drive_controller.set_angular(0)
+            drive_controller.drive()
+            if time.time() - start_time > 0:
+                break
+        return 'success'
+
+class Left(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['success'])
+
+    def execute(self, ud):
+        drive_controller = RobotDriveController()
+        start_time = time.time() + 4.2
+
+        print 'go left'
+
+        while not rospy.is_shutdown():
+            drive_controller.set_velocity(0.8)
+            drive_controller.set_angular(0.26)
             drive_controller.drive()
             if time.time() - start_time > 0:
                 break
