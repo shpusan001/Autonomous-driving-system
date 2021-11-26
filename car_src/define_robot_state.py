@@ -125,6 +125,7 @@ class LaneTrace(State):
             elif count == 3:
                 cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
                 err = -float(cx) / 100
+                # print line.lcx
                 if line.area > 9000.0:
                     drive_controller.set_velocity(0)
                     drive_controller.set_angular(0)
@@ -143,9 +144,10 @@ class LaneTrace(State):
                     drive_controller.set_angular(err)
                     drive_controller.drive()
             else:
-                if count == 4:
-                    drive_controller.set_velocity(0)
-                    drive_controller.set_angular(-0.2)
+                # if count == 4:
+                #     drive_controller.set_velocity(0)
+                #     drive_controller.set_angular(-0.2)
+                #     drive_controller.drive()
                 print 'S course end!'
                 return 'success'
         rospy.sleep()
@@ -158,6 +160,14 @@ class Straight(State):
     def execute(self, ud):
         drive_controller = RobotDriveController()
         start_time = time.time()+5
+
+        while not rospy.is_shutdown():
+            drive_controller.set_velocity(0)
+            drive_controller.set_angular(-0.2)
+            drive_controller.drive()
+            if time.time() - (start_time-4.8) > 0:
+                break
+
         while not rospy.is_shutdown():
             drive_controller.set_velocity(1)
             drive_controller.set_angular(0)
@@ -167,46 +177,48 @@ class Straight(State):
         return 'success'
 
 
-class SCourse(State):
+class SCourseOneStep(State):
     def __init__(self):
         State.__init__(self, outcomes=['success'])
 
     def execute(self, ud):
         line = LineTracer()
         drive_controller = RobotDriveController()
-        rospy.Rate(20)
+        rospy.Rate(10)
         count = 0
 
         while not rospy.is_shutdown():
-            print line.area
+            # print line.area
             if count == 0:
-                cx = (line.lcx - 40 + line.rcx) / 2 - 320
+                cx = (line.lcx - 30 + line.rcx) / 2 - 320
                 err = -float(cx) / 100
 
-                if line.area > 9000.0:
+                if line.area > 6700.0:
                     drive_controller.set_velocity(0)
                     drive_controller.set_angular(0)
                     count = count + 1
                     print('stop!')
                     print(count)
+                    if count == 1:
+                        drive_controller.set_velocity(0)
+                        drive_controller.set_angular(1.2)
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
                     drive_controller.set_velocity(0.6)
-                    drive_controller.set_angular(err)
+                    drive_controller.set_angular(err-0.3)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
                     drive_controller.set_velocity(0.6)
-                    drive_controller.set_angular(err)
+                    drive_controller.set_angular(err-0.3)
                     drive_controller.drive()
-
 
             elif count == 1:
                 cx = (line.lcx - 40 + line.rcx + 10) / 2 - 320
                 err = -float(cx) / 100
 
-                if line.area > 9000.0:
+                if line.area > 13000.0:
                     drive_controller.set_velocity(0)
                     drive_controller.set_angular(0)
                     count = count + 1
@@ -215,38 +227,76 @@ class SCourse(State):
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.4)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.4)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
             elif count == 2:
-                cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+                return 'success'
+        return 'success'
+
+
+class SCourseTwoStep(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['success'])
+
+    def execute(self, ud):
+        line = LineTracer()
+        drive_controller = RobotDriveController()
+        count = 2
+        start_time = time.time() + 2
+        while not rospy.is_shutdown():
+            rospy.Rate(10)
+
+            print('go')
+            while True:
+                drive_controller.set_velocity(0.5)
+                drive_controller.set_angular(0)
+                drive_controller.drive()
+
+                if time.time() - start_time > 0:
+                    break
+
+            print ('turn')
+            while True:
+                drive_controller.set_velocity(0)
+                drive_controller.set_angular(0.8)
+                drive_controller.drive()
+
+                if time.time() - start_time > 0:
+                    break
+
+            while not rospy.is_shutdown():
+                cx = (line.lcx + line.rcx) / 2 - 320
                 err = -float(cx) / 100
-                if line.area > 9000.0:
+                rospy.Rate(10)
+                # print count
+                if line.area > 9000:
                     drive_controller.set_velocity(0)
                     drive_controller.set_angular(0)
-                    count = count + 1
-                    print('stop!')
-                    print(count)
+                    count += 1
+                    print ('stop!')
+                    print (count)
                     rospy.sleep(3)
 
                 if abs(err) >= 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.4)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
-                    drive_controller.set_velocity(0.6)
+                    drive_controller.set_velocity(0.4)
                     drive_controller.set_angular(err)
                     drive_controller.drive()
-            elif count == 3:
-                return 'success'
-        return 'success'
+
+                if count == 3:
+                    return 'success'
+                    break
 
 
 class AvoidObstacle(State):

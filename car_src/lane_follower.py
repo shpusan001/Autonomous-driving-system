@@ -30,7 +30,7 @@ class LineTracer:
         # hsv 이미지로 변환.
         hsv_image = cv2.cvtColor(origin_image, cv2.COLOR_BGR2HSV)
 
-        lower = numpy.array([0, 40, 135])
+        lower = numpy.array([10, 40, 135])
         upper = numpy.array([135, 135, 255])
 
         mask = cv2.inRange(hsv_image, lower, upper)
@@ -55,7 +55,7 @@ class LineTracer:
         # hsv 이미지로 변환.
         hsv_image = cv2.cvtColor(origin_image, cv2.COLOR_BGR2HSV)
 
-        lower = numpy.array([0, 40, 135])  # 0, 0, 200
+        lower = numpy.array([10, 40, 135])  # 0, 0, 200
         upper = numpy.array([135, 135, 255])
 
         mask = cv2.inRange(hsv_image, lower, upper)
@@ -118,22 +118,43 @@ if __name__ == '__main__':
     rate = rospy.Rate(20)
     count = 0
     cnt = 0
-    # drive_controller.set_angular(-0.2)
-    # drive_controller.drive()
+
     while not rospy.is_shutdown():
-        # print line.area
+        print line.area
         if count == 0:
-            cx = (line.lcx + line.rcx) / 2 - 320
+            cx = (line.lcx -40 + line.rcx) / 2 - 320
             err = -float(cx) / 100
 
-        #     if line.area > 12000.0:
-        #         drive_controller.set_velocity(0)
-        #         drive_controller.set_angular(0)
-        #         count = count + 1
-        #         print('stop!')
-        #         print(count)
-        #         rospy.sleep(3)
-        #
+            if line.area > 12000.0:
+                drive_controller.set_velocity(0)
+                drive_controller.set_angular(0)
+                count = count + 1
+                print('stop!')
+                print(count)
+                rospy.sleep(3)
+
+            if abs(err) >= 0.5:
+                drive_controller.set_velocity(0.4)
+                drive_controller.set_angular(err-0.4)
+                drive_controller.drive()
+
+            elif abs(err) < 0.5:
+                drive_controller.set_velocity(0.4)
+                drive_controller.set_angular(err)
+                drive_controller.drive()
+
+        elif count == 1:
+            cx = (line.lcx - 40 + line.rcx + 10) / 2 - 320
+            err = -float(cx) / 100
+
+            if line.area > 12000.0:
+                drive_controller.set_velocity(0)
+                drive_controller.set_angular(0)
+                count = count + 1
+                print('stop!')
+                print(count)
+                rospy.sleep(3)
+
             if abs(err) >= 0.5:
                 drive_controller.set_velocity(0.4)
                 drive_controller.set_angular(err)
@@ -143,52 +164,30 @@ if __name__ == '__main__':
                 drive_controller.set_velocity(0.4)
                 drive_controller.set_angular(err)
                 drive_controller.drive()
-        #
-        # elif count == 1:
-        #     cx = (line.lcx - 40 + line.rcx + 10) / 2 - 320
-        #     err = -float(cx) / 100
-        #
-        #     if line.area > 12000.0:
-        #         drive_controller.set_velocity(0)
-        #         drive_controller.set_angular(0)
-        #         count = count + 1
-        #         print('stop!')
-        #         print(count)
-        #         rospy.sleep(3)
-        #
-        #     if abs(err) >= 0.5:
-        #         drive_controller.set_velocity(0.4)
-        #         drive_controller.set_angular(err)
-        #         drive_controller.drive()
-        #
-        #     elif abs(err) < 0.5:
-        #         drive_controller.set_velocity(0.4)
-        #         drive_controller.set_angular(err)
-        #         drive_controller.drive()
-        #
-        # elif count == 2:
-        #     cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
-        #     err = -float(cx) / 100
-        #     if line.area > 9000.0:
-        #         drive_controller.set_velocity(0)
-        #         drive_controller.set_angular(0)
-        #         count = count + 1
-        #         print('stop!')
-        #         print(count)
-        #         if count == 4:
-        #             drive_controller.set_velocity(0)
-        #             drive_controller.set_angular(-0.2)
-        #         rospy.sleep(3)
-        #
-        #     if abs(err) >= 0.5:
-        #         drive_controller.set_velocity(0.6)
-        #         drive_controller.set_angular(err)
-        #         drive_controller.drive()
-        #
-        #     elif abs(err) < 0.5:
-        #         drive_controller.set_velocity(0.6)
-        #         drive_controller.set_angular(err)
-        #         drive_controller.drive()
+
+        elif count == 2:
+            cx = (line.lcx - 40 + line.rcx + 10) / 2 - 330
+            err = -float(cx) / 100
+            if line.area > 9000.0:
+                drive_controller.set_velocity(0)
+                drive_controller.set_angular(0)
+                count = count + 1
+                print('stop!')
+                print(count)
+                if count == 4:
+                    drive_controller.set_velocity(0)
+                    drive_controller.set_angular(-0.2)
+                rospy.sleep(3)
+
+            if abs(err) >= 0.5:
+                drive_controller.set_velocity(0.6)
+                drive_controller.set_angular(err)
+                drive_controller.drive()
+
+            elif abs(err) < 0.5:
+                drive_controller.set_velocity(0.6)
+                drive_controller.set_angular(err)
+                drive_controller.drive()
 
         rate.sleep()
 
