@@ -8,7 +8,7 @@ if __name__ == "__main__":
     rospy.init_node('test_node')
     driving_test_site = StateMachine(outcomes=['success'])
     with driving_test_site:
-        StateMachine.add('SETTING_LANE', SettingLane(), transitions={'success': 'LANE_TRACE3'})
+        StateMachine.add('SETTING_LANE', SettingLane(), transitions={'success': 'DETECT_BLOCKING_BAR'})
         StateMachine.add('DETECT_BLOCKING_BAR', DetectBlockingBar(), transitions={'success': 'LANE_TRACE'})
         StateMachine.add('LANE_TRACE', LaneTrace(), transitions={'success': 'GO_STRAIGHT'})
         StateMachine.add('GO_STRAIGHT', Straight(), transitions={'success': 'LANE_TRACE2'})
