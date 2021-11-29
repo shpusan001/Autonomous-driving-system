@@ -208,7 +208,7 @@ class SCourseOneStep(State):
 
                 if abs(err) >= 0.5:
                     drive_controller.set_velocity(0.6)
-                    drive_controller.set_angular(err-0.5)
+                    drive_controller.set_angular(err-0.3)
                     drive_controller.drive()
 
                 elif abs(err) < 0.5:
