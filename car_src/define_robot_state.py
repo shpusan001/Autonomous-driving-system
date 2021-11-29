@@ -267,7 +267,7 @@ class SCourseTwoStep(State):
             print ('turn')
             while True:
                 drive_controller.set_velocity(0)
-                drive_controller.set_angular(0.8)
+                drive_controller.set_angular(-0.8)
                 drive_controller.drive()
 
                 if time.time() - start_time > 0:
@@ -307,13 +307,13 @@ class Straight2(State):
 
     def execute(self, ud):
         drive_controller = RobotDriveController()
-        start_time = time.time() + 9
+        start_time = time.time() + 8.5
 
         print 'go straight'
 
         while not rospy.is_shutdown():
             drive_controller.set_velocity(0.7)
-            drive_controller.set_angular(-0.07)
+            drive_controller.set_angular(-0.06)
             drive_controller.drive()
             if time.time() - start_time > 0:
                 break
@@ -371,21 +371,21 @@ class Obstacle_Detect(State):
         cnt = 0
         count = 0
 
-        # while not rospy.is_shutdown():
-        #     cx = (line.lcx + line.rcx) / 2 - 320
-        #     err = -float(cx) / 100
-        #     if abs(err) >= 0.5:
-        #         drive_controller.set_velocity(0.6)
-        #         drive_controller.set_angular(err)
-        #         drive_controller.drive()
-        #
-        #     elif abs(err) < 0.5:
-        #         drive_controller.set_velocity(0.6)
-        #         drive_controller.set_angular(err)
-        #         drive_controller.drive()
-        #
-        #     if time.time() - start_time > 0:
-        #         break
+        while not rospy.is_shutdown():
+            cx = (line.lcx + line.rcx) / 2 - 320
+            err = -float(cx) / 100
+            if abs(err) >= 0.5:
+                drive_controller.set_velocity(0.6)
+                drive_controller.set_angular(err)
+                drive_controller.drive()
+
+            elif abs(err) < 0.5:
+                drive_controller.set_velocity(0.6)
+                drive_controller.set_angular(err)
+                drive_controller.drive()
+
+            if time.time() - start_time > 0:
+                break
 
         while not rospy.is_shutdown():
             cx = (line.lcx + line.rcx) / 2 - 320
@@ -507,7 +507,7 @@ class Left(State):
 
     def execute(self, ud):
         drive_controller = RobotDriveController()
-        start_time = time.time() + 5.8
+        start_time = time.time() + 6.3
 
         print 'go left'
 

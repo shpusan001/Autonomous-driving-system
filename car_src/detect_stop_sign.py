@@ -13,7 +13,7 @@ class ImageConverter:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.match_pub = rospy.Publisher("matches/is_block", Bool, queue_size=1)
-        self.image_sub = rospy.Subscriber("right_camera/rgb/image_raw", Image, self.image_callback)
+        self.image_sub = rospy.Subscriber("camera/rgb/image_raw", Image, self.image_callback)
         self.robot_drive_controller = RobotDriveController()
         self.counters = []
         self.detect = False
@@ -33,10 +33,10 @@ class ImageConverter:
         stop_sign_mask, self.counters, hierarchy = cv2.findContours(stop_sign_mask, cv2.RETR_TREE,
                                                                     cv2.CHAIN_APPROX_SIMPLE)
 
-        if len(self.counters) > 100:
+        if len(self.counters) > 1:
             self.detect = True
-        cv2.imshow('window', image)
-        cv2.waitKey(3)
+        # cv2.imshow('window', image)
+        # cv2.waitKey(3)
 
 
 if __name__ == '__main__':
