@@ -163,7 +163,7 @@ class Straight(State):
 
         while not rospy.is_shutdown():
             drive_controller.set_velocity(0)
-            drive_controller.set_angular(-0.2)
+            drive_controller.set_angular(-0.15)
             drive_controller.drive()
             if time.time() - (start_time-4.8) > 0:
                 break
@@ -298,6 +298,23 @@ class SCourseTwoStep(State):
                     return 'success'
                     break
 
+class Straight2(State):
+    def __init__(self):
+        State.__init__(self, outcomes=['success'])
+
+    def execute(self, ud):
+        drive_controller = RobotDriveController()
+        start_time = time.time() + 5.25
+
+        print 'go straight'
+
+        while not rospy.is_shutdown():
+            drive_controller.set_velocity(1)
+            drive_controller.set_angular(-0.1)
+            drive_controller.drive()
+            if time.time() - start_time > 0:
+                break
+        return 'success'
 
 class AvoidObstacle(State):
     def __init__(self):
