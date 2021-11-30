@@ -35,12 +35,3 @@ class ImageConverter:
 
         if len(self.counters) > 1:
             self.detect = True
-        # cv2.imshow('window', image)
-        # cv2.waitKey(3)
-
-
-if __name__ == '__main__':
-    rospy.init_node('image_converter')
-    ic = ImageConverter()
-
-    rospy.spin()
