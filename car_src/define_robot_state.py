@@ -155,13 +155,14 @@ class Straight(State):
 
     def execute(self, ud):
         drive_controller = RobotDriveController()
-        start_time = time.time()+5
+        start_time = time.time()+1
 
         while not rospy.is_shutdown():
             drive_controller.set_velocity(0)
-            drive_controller.set_angular(-0.15)
+            drive_controller.set_angular(-0.05)
             drive_controller.drive()
-            if time.time() - (start_time-4.8) > 0:
+            if time.time() - start_time > 0:
+                start_time += 5
                 break
 
         while not rospy.is_shutdown():
@@ -185,10 +186,10 @@ class SCourseOneStep(State):
 
         while not rospy.is_shutdown():
             if count == 0:
-                cx = (line.lcx - 30 + line.rcx) / 2 - 320
+                cx = (line.lcx - 15 + line.rcx) / 2 - 320
                 err = -float(cx) / 100
 
-                if line.area > 6700.0:
+                if line.area > 8400.0:
                     drive_controller.set_velocity(0)
                     drive_controller.set_angular(0)
                     count = count + 1
@@ -252,12 +253,13 @@ class SCourseTwoStep(State):
                 drive_controller.drive()
 
                 if time.time() - start_time > 0:
+                    start_time += 1
                     break
 
             print ('turn')
             while True:
-                drive_controller.set_velocity(0)
-                drive_controller.set_angular(-1)
+                drive_controller.set_velocity(0.5)
+                drive_controller.set_angular(-0.6)
                 drive_controller.drive()
 
                 if time.time() - start_time > 0:
