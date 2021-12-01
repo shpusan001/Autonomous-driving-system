@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import math
 import rospy
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String, Bool
 from robot_drive_controller import RobotDriveController
 
 
