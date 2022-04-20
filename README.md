@@ -5,6 +5,6 @@
 
 ## 주행영상
 ### 1차선
-[1차선_주행영상_유튜브](https://youtu.be/nH4beAYgOvQ)
+[1차선_주행영상_유튜브](https://youtu.be/SCxEoTXTyjw)
 ### 2차선
-[1차선_주행영상_유튜브](https://youtu.be/SCxEoTXTyj)
+[2차선_주행영상_유튜브](https://youtu.be/nH4beAYgOvQ)
