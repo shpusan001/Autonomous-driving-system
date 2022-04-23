@@ -8,3 +8,9 @@
 [1차선_주행영상_유튜브](https://youtu.be/SCxEoTXTyjw)
 ### 2차선
 [2차선_주행영상_유튜브](https://youtu.be/nH4beAYgOvQ)
+
+## 개발자들
++ 이상훈
++ 구본영
++ 김현지
++ 사공민수
